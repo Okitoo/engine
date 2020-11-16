@@ -69,13 +69,35 @@ func (l *Line3) Delta(optionalTarget *Vector3) *Vector3 {
 // DistanceSq returns the square of the distance from the start point to the end point.
 func (l *Line3) DistanceSq() float32 {
 
-	return l.start.DistanceToSquared(&l.end)
+	return l.start.DistanceTo(&l.end)
 }
 
 // Distance returns the distance from the start point to the end point.
 func (l *Line3) Distance() float32 {
 
 	return l.start.DistanceTo(&l.end)
+}
+
+// DistanceToVec3 returns the shortest distance between the line and a vector
+func (l *Line3) DistanceToVec3(v *Vector3) float32 {
+	d := l.Delta(nil)
+
+	w1 := NewVec3().SubVectors(v, &l.start)
+	d1 := w1.Dot(d)
+	if d1 <= 0 {
+		return v.DistanceTo(&l.start)
+	}
+
+	w2 := NewVec3().SubVectors(v, &l.end)
+	d2 := w2.Dot(d)
+	if d2 >= 0 {
+		return v.DistanceTo(&l.end)
+	}
+
+	b := d1 / l.DistanceSq()
+	pb := d.MultiplyScalar(b).Add(&l.start)
+
+	return pb.DistanceTo(v)
 }
 
 // ApplyMatrix4 applies the specified matrix to this line segment start and end points.
@@ -97,4 +119,9 @@ func (l *Line3) Equals(other *Line3) bool {
 func (l *Line3) Clone() *Line3 {
 
 	return NewLine3(&l.start, &l.end)
+}
+
+// Ray Converts the line to a ray and returns the new ray
+func (l *Line3) Ray() *Ray {
+	return NewRay(&l.start, l.Delta(nil).Normalize())
 }

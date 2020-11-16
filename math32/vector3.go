@@ -114,6 +114,11 @@ func (v *Vector3) Zero() *Vector3 {
 	return v
 }
 
+// IsZero return true if all values are zero
+func (v *Vector3) IsZero() bool {
+	return v.X == 0 && v.Y == 0 && v.Z == 0
+}
+
 // Copy copies other vector to this one.
 // It is equivalent to: *v = *other.
 // Returns the pointer to this updated vector.
@@ -439,7 +444,7 @@ func (v *Vector3) MultiplyVectors(a, b *Vector3) *Vector3 {
 	return v
 }
 
-// ApplyAxisAngle rotates the vector around axis by angle.
+// ApplyAxisAngle rotates the vector (clockwise to the direction of the axis) around axis by angle.
 // Returns the pointer to this updated vector.
 func (v *Vector3) ApplyAxisAngle(axis *Vector3, angle float32) *Vector3 {
 
@@ -587,6 +592,16 @@ func (v *Vector3) SetFromMatrixPosition(m *Matrix4) *Vector3 {
 	return v
 }
 
+// SetFromVec3 set this vector from the otherVector
+// and returns itself
+func (v *Vector3) SetFromVec3(m *Vector3) *Vector3 {
+
+	v.X = m.X
+	v.Y = m.Y
+	v.Z = m.Z
+	return v
+}
+
 // SetFromMatrixColumn set this vector with the column at index of the m matrix.
 // Returns the pointer to this updated vector.
 func (v *Vector3) SetFromMatrixColumn(index int, m *Matrix4) *Vector3 {
@@ -642,12 +657,12 @@ func (v *Vector3) SetFromQuaternion(q *Quaternion) *Vector3 {
 // RandomTangents computes and returns two arbitrary tangents to the vector.
 func (v *Vector3) RandomTangents() (*Vector3, *Vector3) {
 
-	t1 := NewVector3(0,0,0)
-	t2 := NewVector3(0,0,0)
+	t1 := NewVector3(0, 0, 0)
+	t2 := NewVector3(0, 0, 0)
 	length := v.Length()
 	if length > 0 {
 		n := NewVector3(v.X/length, v.Y/length, v.Z/length)
-		randVec := NewVector3(0,0,0)
+		randVec := NewVector3(0, 0, 0)
 		if Abs(n.X) < 0.9 {
 			randVec.SetX(1)
 			t1.CrossVectors(n, randVec)
@@ -671,10 +686,10 @@ func (v *Vector3) RandomTangents() (*Vector3, *Vector3) {
 // AlmostEquals returns whether the vector is almost equal to another vector within the specified tolerance.
 func (v *Vector3) AlmostEquals(other *Vector3, tolerance float32) bool {
 
-	if (Abs(v.X - other.X) < tolerance) &&
-		(Abs(v.Y - other.Y) < tolerance) &&
-		(Abs(v.Z - other.Z) < tolerance) {
-			return true
+	if (Abs(v.X-other.X) < tolerance) &&
+		(Abs(v.Y-other.Y) < tolerance) &&
+		(Abs(v.Z-other.Z) < tolerance) {
+		return true
 	}
 	return false
 }
